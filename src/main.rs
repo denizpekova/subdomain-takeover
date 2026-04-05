@@ -2,10 +2,25 @@ mod helper;
 
 use anyhow::Result;
 use colored::*;
-use std::io::{self, Write};
+use std::io::Write;
+use tokio::io::{self, AsyncBufReadExt};
+
+
+async fn get_input(prompt: &str, stdin: &mut io::BufReader<io::Stdin>) -> Result<String> {
+    print!("{}", prompt);
+
+    std::io::stdout().flush()?;
+    
+    let mut buffer = String::new();
+
+    stdin.read_line(&mut buffer).await?;
+    Ok(buffer.trim().to_string())
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let mut stdin = io::BufReader::new(io::stdin());
+
     loop {
         println!("\n{}", "=== ANA MENÜ ===".bold().blue());
         println!("1 -> Subdomain Takeover Kontrolü");
@@ -15,34 +30,21 @@ async fn main() -> Result<()> {
         println!("5 -> HTTP Güvenlik Başlıkları Kontrolü");
         println!("6 -> Çıkış");
 
-        print!("{} ", "Seçiminiz:".bold().yellow());
-        io::stdout().flush()?;
+        let choice = get_input(&format!("{} ", "Seçiminiz:".bold().yellow()), &mut stdin).await?;
 
-        let mut choice = String::new();
-        io::stdin().read_line(&mut choice)?;
-
-        match choice.trim() {
+        match choice.as_str() {
             "1" => {
-                print!("{} ", "Hedef Domain (örn: sub.example.com):".bold().green());
-                io::stdout().flush()?;
-
-                let mut target_input = String::new();
-                io::stdin().read_line(&mut target_input)?;
-                let target = target_input.trim();
-
+                let target = get_input(&format!("{} ", "Hedef Domain (örn: sub.example.com):".bold().green()), &mut stdin).await?;
+                
                 if !target.is_empty() {
                     println!("\n[{}] {} için Takeover Kontrolü Başlatılıyor...", "+".cyan(), target.white());
-                    helper::takeover::check_takeover(target).await;
+                    helper::takeover::check_takeover(&target).await;
                 } else {
                     println!("{}", "HATA: Domain girmediniz!".red());
                 }
             }
             "2" => {
-                print!("{} ", "Hedef Adres (örn: example.com):".bold().green());
-                io::stdout().flush()?;
-                let mut target_input = String::new();
-                io::stdin().read_line(&mut target_input)?;
-                let target = target_input.trim();
+                let target = get_input(&format!("{} ", "Hedef Adres (örn: example.com):".bold().green()), &mut stdin).await?;
 
                 if target.is_empty() {
                     println!("{}", "HATA: Hedef girmediniz!".red());
@@ -51,17 +53,12 @@ async fn main() -> Result<()> {
 
                 println!("\n[{}] Tüm portların (1..65535) taraması başlatılıyor. Bu işlem vakit alabilir...", "+".cyan());
                 
-                // Artık aralık istemeden direkt taratıyoruz
-                if let Err(e) = helper::scanner::scan_ports(target.to_string()).await {
+                if let Err(e) = helper::scanner::scan_ports(target).await {
                     println!("{} {}", "Tarama Hatası:".red(), e);
                 }
             }
             "3" => {
-                print!("{} ", "Hedef Domain (örn: example.com):".bold().green());
-                io::stdout().flush()?;
-                let mut target_input = String::new();
-                io::stdin().read_line(&mut target_input)?;
-                let target = target_input.trim().to_string();
+                let target = get_input(&format!("{} ", "Hedef Domain (örn: example.com):".bold().green()), &mut stdin).await?;
 
                 if target.is_empty() {
                     println!("{}", "HATA: Hedef domain girmediniz!".red());
@@ -71,20 +68,13 @@ async fn main() -> Result<()> {
                 print!("{} Wordlist'i internetten mi (SecLists 5000) çekelim, yoksa kendi dosyanızı mı kullanacaksınız?\n", "[-]".cyan());
                 println!("1 -> İnternetten doğrudan çek (Tavsiye edilen)");
                 println!("2 -> Kendi dosyamı gireceğim");
-                print!("{} Seçiminiz: ", "=>".bold().yellow());
-                io::stdout().flush()?;
                 
-                let mut wl_choice = String::new();
-                io::stdin().read_line(&mut wl_choice)?;
+                let wl_choice = get_input(&format!("{} Seçiminiz: ", "=>".bold().yellow()), &mut stdin).await?;
                 
-                let wordlist_source = match wl_choice.trim() {
+                let wordlist_source = match wl_choice.as_str() {
                     "1" => "default_url".to_string(),
                     "2" => {
-                        print!("{} ", "Wordlist Dosya Yolu (örn: subdomains.txt):".bold().green());
-                        io::stdout().flush()?;
-                        let mut wordlist_input = String::new();
-                        io::stdin().read_line(&mut wordlist_input)?;
-                        let wordlist = wordlist_input.trim().to_string();
+                        let wordlist = get_input(&format!("{} ", "Wordlist Dosya Yolu (örn: subdomains.txt):".bold().green()), &mut stdin).await?;
                         if wordlist.is_empty() {
                             println!("{}", "HATA: Dosya yolu girmediniz!".red());
                             continue;
@@ -102,34 +92,26 @@ async fn main() -> Result<()> {
                 }
             }
             "4" => {
-                print!("{} ", "Hedef Domain (örn: example.com):".bold().green());
-                io::stdout().flush()?;
-                let mut target_input = String::new();
-                io::stdin().read_line(&mut target_input)?;
-                let target = target_input.trim();
+                let target = get_input(&format!("{} ", "Hedef Domain (örn: example.com):".bold().green()), &mut stdin).await?;
 
                 if target.is_empty() {
                     println!("{}", "HATA: Hedef domain girmediniz!".red());
                     continue;
                 }
 
-                if let Err(e) = helper::dns::run(target).await {
+                if let Err(e) = helper::dns::run(&target).await {
                     println!("{} {}", "DNS Keşif Hatası:".red(), e);
                 }
             }
             "5" => {
-                print!("{} ", "Hedef Domain (örn: example.com):".bold().green());
-                io::stdout().flush()?;
-                let mut target_input = String::new();
-                io::stdin().read_line(&mut target_input)?;
-                let target = target_input.trim();
+                let target = get_input(&format!("{} ", "Hedef Domain (örn: example.com):".bold().green()), &mut stdin).await?;
 
                 if target.is_empty() {
                     println!("{}", "HATA: Hedef domain girmediniz!".red());
                     continue;
                 }
 
-                if let Err(e) = helper::header::run(target).await {
+                if let Err(e) = helper::header::run(&target).await {
                     println!("{} {}", "Başlık Kontrol Hatası:".red(), e);
                 }
             }
