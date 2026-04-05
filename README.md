@@ -26,6 +26,11 @@ Bu proje, Rust tabanlı, yüksek performanslı ve asenkron (`Tokio` altyapısı)
     * **NS** (Kök Ad Sunucuları)
     * **TXT** (SPF, DMARC politikaları ve diğer doğrulamalar)
 
+### 5. 🛡️ HTTP Güvenlik Başlıkları Kontrolü
+* Web uygulamalarının güvenlik duruşunu güçlendiren kritik HTTP Security başlıklarını kontrol eder (`Strict-Transport-Security`, `X-Frame-Options`, `Content-Security-Policy` vb.).
+* Hem mevcut korumaları ekrana listeler hem de potansiyel güvenlik sıkıntıları doğurabilecek unutulumuş (eksik) başlıkları kırmızıyla uyarır.
+* Ek olarak bilgi sızdıran `Server` başlıklarını ifşa eder.
+
 ---
 
 ## 🛠️ Teknolojiler Yığını (Tech Stack)
@@ -60,7 +65,8 @@ Sisteminizde [Cargo ve Rust](https://rustup.rs/) kurulu olmalıdır.
    2 -> Port Tarayıcı (Tüm Portlar - 1..65535)
    3 -> Subdomain Keşfi (Wordlist)
    4 -> DNS Kayıt Keşfi (A, MX, NS, TXT vb.)
-   5 -> Çıkış
+   5 -> HTTP Güvenlik Başlıkları Kontrolü
+   6 -> Çıkış
    ```
 
 ---

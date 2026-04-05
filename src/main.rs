@@ -12,7 +12,8 @@ async fn main() -> Result<()> {
         println!("2 -> Port Tarayıcı (Tüm Portlar - 1..65535)");
         println!("3 -> Subdomain Keşfi (Wordlist)");
         println!("4 -> DNS Kayıt Keşfi (A, MX, NS, TXT vb.)");
-        println!("5 -> Çıkış");
+        println!("5 -> HTTP Güvenlik Başlıkları Kontrolü");
+        println!("6 -> Çıkış");
 
         print!("{} ", "Seçiminiz:".bold().yellow());
         io::stdout().flush()?;
@@ -116,7 +117,23 @@ async fn main() -> Result<()> {
                     println!("{} {}", "DNS Keşif Hatası:".red(), e);
                 }
             }
-            "5" | "q" | "quit" | "exit" => {
+            "5" => {
+                print!("{} ", "Hedef Domain (örn: example.com):".bold().green());
+                io::stdout().flush()?;
+                let mut target_input = String::new();
+                io::stdin().read_line(&mut target_input)?;
+                let target = target_input.trim();
+
+                if target.is_empty() {
+                    println!("{}", "HATA: Hedef domain girmediniz!".red());
+                    continue;
+                }
+
+                if let Err(e) = helper::header::run(target).await {
+                    println!("{} {}", "Başlık Kontrol Hatası:".red(), e);
+                }
+            }
+            "6" | "q" | "quit" | "exit" => {
                 println!("{}", "Çıkış yapılıyor. İyi çalışmalar!".magenta());
                 break;
             }
