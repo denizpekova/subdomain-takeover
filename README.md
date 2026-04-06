@@ -108,8 +108,6 @@ Bu proje **MIT Lisansı** altında lisanslanmıştır. Detaylar için [LICENSE](
 Projenin asenkron çalışma hızını ve özelliklerini gösteren terminal kayıtları aşağıdadır:
 
 <div align="center">
-  <video src="demo/project-demo.webm" width="800" controls="controls">
-    Tarayıcınız video formatını desteklemiyor. Alternatif olarak videoyu <a href="demo/project-demo.webm">buradan indirebilirsiniz</a>.
-  </video>
+  <img src="demo/project-demo.webp" width="800" alt="Terminal Demo GIF" />
 </div>
 
