@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Subdomain Takeover Demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    background-color: #0d1117; 
+    color: #c9d1d9; 
+    font-family: 'Consolas', 'Courier New', monospace; 
+    font-size: 14px; 
+    padding: 0;
+    overflow-x: hidden;
+  }
+  .window-bar {
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .win-title { color: #8b949e; font-size: 12px; margin-left: 8px; }
+  #terminal { 
+    padding: 16px 20px; 
+    white-space: pre-wrap; 
+    line-height: 1.55; 
+    min-height: 600px;
+  }
+  .prompt { color: #79c0ff; }
+  .cmd { color: #e6edf3; font-weight: bold; }
+  .success { color: #3fb950; }
+  .warning { color: #d29922; }
+  .danger { color: #ff7b72; }
+  .brand { color: #d2a8ff; font-weight: bold; }
+  .info { color: #58a6ff; }
+  .dim { color: #8b949e; }
+  .cursor { 
+    display: inline-block; 
+    width: 8px; 
+    height: 15px; 
+    background-color: #c9d1d9; 
+    animation: blink 1s step-end infinite; 
+    vertical-align: middle; 
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="window-bar">
+  <div class="dot dot-red"></div>
+  <div class="dot dot-yellow"></div>
+  <div class="dot dot-green"></div>
+  <span class="win-title">Windows PowerShell — subdomain-takeover</span>
+</div>
+<div id="terminal"></div><span class="cursor"></span>
+
+<script>
+// Each entry: { text, delay (before printing), color, type (typewriter), prompt (no newline) }
+const steps = [
+  // --- Build ---
+  { text: "PS C:\\Users\\Desktop\\subdomain-takeover> ", color:"prompt" },
+  { text: "cargo build --release\n", color:"cmd", type:true, charDelay:30 },
+  { text: "   Compiling proc-macro2 v1.0.78\n", wait:300 },
+  { text: "   Compiling unicode-ident v1.0.12\n", wait:80 },
+  { text: "   Compiling libc v0.2.153\n", wait:80 },
+  { text: "   Compiling tokio v1.37.0\n", wait:80 },
+  { text: "   Compiling reqwest v0.11.24\n", wait:120 },
+  { text: "   Compiling hickory-resolver v0.24.0\n", wait:120 },
+  { text: "   Compiling subdomain-takeover v0.1.0\n", wait:200 },
+  { text: "    Finished `release` profile [optimized] target(s) in 8.43s\n", wait:600, color:"success" },
+
+  // --- Run binary ---
+  { text: "\nPS C:\\Users\\Desktop\\subdomain-takeover> ", color:"prompt", wait:400 },
+  { text: ".\\target\\release\\subdomain-takeover.exe\n", color:"cmd", type:true, charDelay:25 },
+  { text: "\n=== ANA MENÜ ===\n", wait:300, color:"brand" },
+  { text: "1 -> Subdomain Takeover Kontrolü\n", wait:40 },
+  { text: "2 -> Port Tarayıcı (Tüm Portlar - 1..65535)\n", wait:40 },
+  { text: "3 -> Subdomain Keşfi (Wordlist)\n", wait:40 },
+  { text: "4 -> DNS Kayıt Keşfi (A, MX, NS, TXT vb.)\n", wait:40 },
+  { text: "5 -> HTTP Güvenlik Başlıkları Kontrolü\n", wait:40 },
+  { text: "6 -> Çıkış\n", wait:40 },
+
+  // --- Feature 1: Subdomain Takeover ---
+  { text: "Seçiminiz: ", color:"prompt", wait:600 },
+  { text: "1\n", color:"cmd", type:true, charDelay:80 },
+  { text: "Hedef Domain (örn: sub.example.com): ", color:"prompt", wait:400 },
+  { text: "test.github.io\n", color:"cmd", type:true, charDelay:50 },
+  { text: "\n[+] test.github.io için Takeover Kontrolü Başlatılıyor...\n", wait:600, color:"info" },
+  { text: "  [!!!] POTANSİYEL TAKEOVER BULUNDU! Servis: GitHub Pages\n", wait:800, color:"danger" },
+
+  { text: "\n=== ANA MENÜ ===\n", wait:700, color:"brand" },
+  { text: "1 -> Subdomain Takeover Kontrolü\n", wait:40 },
+  { text: "2 -> Port Tarayıcı (Tüm Portlar - 1..65535)\n", wait:40 },
+  { text: "3 -> Subdomain Keşfi (Wordlist)\n", wait:40 },
+  { text: "4 -> DNS Kayıt Keşfi (A, MX, NS, TXT vb.)\n", wait:40 },
+  { text: "5 -> HTTP Güvenlik Başlıkları Kontrolü\n", wait:40 },
+  { text: "6 -> Çıkış\n", wait:40 },
+
+  // --- Feature 2: DNS Enumeration ---
+  { text: "Seçiminiz: ", color:"prompt", wait:600 },
+  { text: "4\n", color:"cmd", type:true, charDelay:80 },
+  { text: "Hedef Domain (örn: example.com): ", color:"prompt", wait:400 },
+  { text: "example.com\n", color:"cmd", type:true, charDelay:50 },
+  { text: "\n🌐 example.com için DNS Kayıtları Sorgulanıyor...\n", wait:700 },
+  { text: "  [A]    example.com -> 104.18.26.120\n", wait:400, color:"success" },
+  { text: "  [A]    example.com -> 104.18.27.120\n", wait:150, color:"success" },
+  { text: "  [AAAA] example.com -> 2606:4700::6812:1a78\n", wait:150, color:"success" },
+  { text: "  [AAAA] example.com -> 2606:4700::6812:1b78\n", wait:150, color:"success" },
+  { text: "  [MX]   example.com -> . (Öncelik: 0)\n", wait:150, color:"warning" },
+  { text: "  [NS]   example.com -> hera.ns.cloudflare.com.\n", wait:150, color:"success" },
+  { text: "  [NS]   example.com -> elliott.ns.cloudflare.com.\n", wait:150, color:"success" },
+  { text: "  [TXT]  example.com -> v=spf1 -all\n", wait:150, color:"info" },
+  { text: "  [TXT]  example.com -> _k2n1y4vw3qtb4skdx9e7dxt97qrmmq9\n", wait:150, color:"info" },
+  { text: "✅ DNS keşfi tamamlandı.\n", wait:300, color:"success" },
+
+  { text: "\n=== ANA MENÜ ===\n", wait:700, color:"brand" },
+  { text: "1 -> Subdomain Takeover Kontrolü\n", wait:40 },
+  { text: "2 -> Port Tarayıcı (Tüm Portlar - 1..65535)\n", wait:40 },
+  { text: "3 -> Subdomain Keşfi (Wordlist)\n", wait:40 },
+  { text: "4 -> DNS Kayıt Keşfi (A, MX, NS, TXT vb.)\n", wait:40 },
+  { text: "5 -> HTTP Güvenlik Başlıkları Kontrolü\n", wait:40 },
+  { text: "6 -> Çıkış\n", wait:40 },
+
+  // --- Feature 3: HTTP Security Headers ---
+  { text: "Seçiminiz: ", color:"prompt", wait:600 },
+  { text: "5\n", color:"cmd", type:true, charDelay:80 },
+  { text: "Hedef Domain (örn: example.com): ", color:"prompt", wait:400 },
+  { text: "example.com\n", color:"cmd", type:true, charDelay:50 },
+  { text: "\n🌐 https://example.com için HTTP Güvenlik Başlıkları Kontrol Ediliyor...\n", wait:600 },
+  { text: "\n[+] Bulunan Güvenlik Başlıkları:\n", wait:400, color:"success" },
+  { text: "\n[-] Eksik veya İhmal Edilmiş Güvenlik Başlıkları:\n", wait:400, color:"warning" },
+  { text: "  [!] strict-transport-security bulunamadı!\n", wait:200, color:"danger" },
+  { text: "  [!] x-frame-options bulunamadı!\n", wait:150, color:"danger" },
+  { text: "  [!] x-content-type-options bulunamadı!\n", wait:150, color:"danger" },
+  { text: "  [!] content-security-policy bulunamadı!\n", wait:150, color:"danger" },
+  { text: "  [!] x-xss-protection bulunamadı!\n", wait:150, color:"danger" },
+  { text: "  [!] referrer-policy bulunamadı!\n", wait:150, color:"danger" },
+  { text: "  [!] permissions-policy bulunamadı!\n", wait:150, color:"danger" },
+  { text: "\n[i] Sunucu (Server): cloudflare\n", wait:300, color:"info" },
+  { text: "✅ Başlık analizi tamamlandı.\n", wait:300, color:"success" },
+
+  { text: "\n=== ANA MENÜ ===\n", wait:700, color:"brand" },
+  { text: "1 -> Subdomain Takeover Kontrolü\n", wait:40 },
+  { text: "2 -> Port Tarayıcı (Tüm Portlar - 1..65535)\n", wait:40 },
+  { text: "3 -> Subdomain Keşfi (Wordlist)\n", wait:40 },
+  { text: "4 -> DNS Kayıt Keşfi (A, MX, NS, TXT vb.)\n", wait:40 },
+  { text: "5 -> HTTP Güvenlik Başlıkları Kontrolü\n", wait:40 },
+  { text: "6 -> Çıkış\n", wait:40 },
+
+  // --- Exit ---
+  { text: "Seçiminiz: ", color:"prompt", wait:600 },
+  { text: "6\n", color:"cmd", type:true, charDelay:80 },
+  { text: "Çıkış yapılıyor. İyi çalışmalar!\n", wait:400, color:"success" },
+
+  // --- Project tree ---
+  { text: "\nPS C:\\Users\\Desktop\\subdomain-takeover> ", color:"prompt", wait:900 },
+  { text: "tree /F /A src\n", color:"cmd", type:true, charDelay:30 },
+  { text: "\nsrc\n", wait:300 },
+  { text: "|   main.rs        (5.4 KB) — Ana menü & async runtime\n", wait:100, color:"info" },
+  { text: "\\---helper\n", wait:100 },
+  { text: "        dns.rs     (2.1 KB) — DNS kayıt keşfi (hickory)\n", wait:100, color:"info" },
+  { text: "        header.rs  (2.8 KB) — HTTP güvenlik başlıkları\n", wait:100, color:"info" },
+  { text: "        scanner.rs (1.9 KB) — TCP port tarayıcı\n", wait:100, color:"info" },
+  { text: "        subdomain.rs (2.0 KB) — Wordlist brute-force\n", wait:100, color:"info" },
+  { text: "        takeover.rs (3.0 KB) — Subdomain takeover\n", wait:100, color:"info" },
+  { text: "        mod.rs     (90 B)  — Module exports\n", wait:100, color:"dim" },
+
+  { text: "\nPS C:\\Users\\Desktop\\subdomain-takeover> ", color:"prompt", wait:1000 },
+];
+
+const terminal = document.getElementById("terminal");
+
+async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function typeText(text, color) {
+  let span = document.createElement("span");
+  if (color) span.className = color;
+  terminal.appendChild(span);
+  for (let ch of text) {
+    span.textContent += ch;
+    await sleep(30);
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+}
+
+async function run() {
+  await sleep(500);
+  for (let step of steps) {
+    if (step.wait) await sleep(step.wait);
+    if (step.type) {
+      await typeText(step.text, step.color);
+    } else {
+      let span = document.createElement("span");
+      if (step.color) span.className = step.color;
+      span.textContent = step.text;
+      terminal.appendChild(span);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+  }
+}
+
+run();
+</script>
+</body>
+</html>
