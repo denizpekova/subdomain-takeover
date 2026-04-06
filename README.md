@@ -108,9 +108,8 @@ Bu proje **MIT Lisansı** altında lisanslanmıştır. Detaylar için [LICENSE](
 Projenin asenkron çalışma hızını ve özelliklerini gösteren terminal kayıtları aşağıdadır:
 
 <div align="center">
-  <!-- Place your actual video or gif here -->
-  <a href="demo/project-demo.webm">
-    <img src="https://via.placeholder.com/800x450.png?text=Play+Terminal+Demo" alt="Subdomain Takeover WebM Demo" />
-  </a>
+  <video src="demo/project-demo.webm" width="800" controls="controls">
+    Tarayıcınız video formatını desteklemiyor. Alternatif olarak videoyu <a href="demo/project-demo.webm">buradan indirebilirsiniz</a>.
+  </video>
 </div>
 
