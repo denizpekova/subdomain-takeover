@@ -13,8 +13,8 @@ Bu proje, Rust tabanlı, yüksek performanslı ve asenkron (`Tokio` altyapısı)
 ---
 
 **Öğrenci:** Deniz Pekova  
-**Danışman Akademisyen:** (BURAYA DANIŞMAN İSMİ YAZINIZ)  
-**Kurum:** İstinye Üniversitesi, Bilgi Güvenliği Teknolojisi
+**Danışman Akademisyen:** Keyvan Arasteh
+**Kurum:** İstinye Üniversitesi, Bilişim Güvenliği Teknolojisi
 
 ---
 
