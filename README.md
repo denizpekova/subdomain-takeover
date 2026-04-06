@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/tr/6/6b/%C4%B0stinye_%C3%9Cniversitesi.png" alt="İstinye University Logo" width="150" />
+  <img src="https://devtest.pekova.com.tr/app/cv/img/istinye-universitesi.png" alt="İstinye University Logo" width="150" />
   
   # ⚡ Async Subdomain Takeover & Pentest Toolkit
 
