@@ -1,6 +1,8 @@
 use hickory_resolver::TokioAsyncResolver;
 use colored::*;
 
+/// Retrieves and prints public DNS records (A, AAAA, MX, NS, TXT) for the given target domain.
+/// Makes use of TokioAsyncResolver for fast non-blocking UDP/TCP DNS queries.
 pub async fn run(target: &str) -> anyhow::Result<()> {
     let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
     
@@ -45,4 +47,16 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
     
     println!("✅ DNS keşfi tamamlandı.\n");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_dns_lookup() {
+        // Test with localhost which should fail gracefully and not panic
+        let res = run("localhost").await;
+        assert!(res.is_ok());
+    }
 }

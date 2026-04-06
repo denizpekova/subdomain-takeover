@@ -2,11 +2,13 @@ use hickory_resolver::TokioAsyncResolver;
 use reqwest::Client;
 use std::time::Duration;
 
+/// Representation of a known SaaS fingerprint for takeover analysis.
 struct Fingerprint {
     service: &'static str,
     nxdomain_response: &'static str,
 }
 
+/// Known fingerprint signatures list.
 const FINGERPRINTS: &[Fingerprint] = &[
     Fingerprint {
         service: "GitHub Pages",
@@ -14,7 +16,7 @@ const FINGERPRINTS: &[Fingerprint] = &[
     },
     Fingerprint {
         service: "Heroku",
-        nxdomain_response: "No such app",
+        nxdomain_response: "No securing app",
     },
     Fingerprint {
         service: "AWS S3",
@@ -30,6 +32,9 @@ const FINGERPRINTS: &[Fingerprint] = &[
     },
 ];
 
+/// Checks the possibility of a Subdomain Takeover by comparing HTTP responses 
+/// with known cloud service provider error texts (fingerprints).
+/// Will also fallback to checking DNS resolution if HTTP fails.
 pub async fn check_takeover(domain: &str) {
     let client = Client::builder()
         .timeout(Duration::from_secs(5))
@@ -71,5 +76,18 @@ pub async fn check_takeover(domain: &str) {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_takeover_check() {
+        // Try against a known invalid domain. It shouldn't panic.
+        check_takeover("invalid-test-domain-123456.local").await;
+        // If it reaches here without panic, test passes
+        assert!(true);
     }
 }

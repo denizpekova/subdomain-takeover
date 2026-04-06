@@ -2,6 +2,7 @@ use reqwest::Client;
 use colored::*;
 use std::time::Duration;
 
+/// Essential security headers to look for in the HTTP response.
 const SECURITY_HEADERS: &[&str] = &[
     "strict-transport-security",
     "x-frame-options",
@@ -12,6 +13,9 @@ const SECURITY_HEADERS: &[&str] = &[
     "permissions-policy",
 ];
 
+/// Checks the target website for common missing web security headers.
+/// Useful for identifying potential clickjacking, XSS, or other misconfigurations.
+/// It automatically prefixes the target with HTTPS if no scheme is provided.
 pub async fn run(target: &str) -> anyhow::Result<()> {
     let client = Client::builder()
         .timeout(Duration::from_secs(5))
@@ -60,4 +64,16 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
 
     println!("\n✅ Başlık analizi tamamlandı.\n");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_header_run_invalid_url() {
+        // Just verify it doesn't crash on completely invalid non-resolving domains
+        let res = run("http://this-does-not-exist.test-domain").await;
+        assert!(res.is_ok());
+    }
 }

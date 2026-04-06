@@ -2,6 +2,8 @@ use hickory_resolver::TokioAsyncResolver;
 use std::fs::read_to_string;
 use colored::*;
 
+/// Reads a local wordlist or downloads SecLists Top 1 Million 5000 records dynamically, 
+/// then concurrently resolves subdomains against the provided target domain using `hickory_resolver`.
 pub async fn run(target: String, source: String) -> anyhow::Result<()> {
     let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
     
@@ -39,4 +41,15 @@ pub async fn run(target: String, source: String) -> anyhow::Result<()> {
     
     println!("✅ Subdomain keşfi tamamlandı.\n");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_subdomain_run_invalid_file() {
+        let res = run("example.com".to_string(), "nonexistent_file_path.txt".to_string()).await;
+        assert!(res.is_err(), "Should error on nonexistent local file");
+    }
 }
