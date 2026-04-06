@@ -107,7 +107,5 @@ Bu proje **MIT Lisansı** altında lisanslanmıştır. Detaylar için [LICENSE](
 
 Projenin asenkron çalışma hızını ve özelliklerini gösteren terminal kayıtları aşağıdadır:
 
-<div align="center">
-  <img src="demo/project-demo.webp" width="800" alt="Terminal Demo GIF" />
-</div>
+![Terminal Demo](demo/project-demo.gif)
 

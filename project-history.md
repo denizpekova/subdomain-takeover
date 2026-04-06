@@ -5,7 +5,6 @@ Bu belge, **Subdomain Takeover & Pentest Toolkit** aracının geliştirilme sür
 ## 📌 Sürüm & Geliştirme Notları
 
 ### 🚀 Nisan 2026 - v1.1.0 (Modernizasyon & Kalite Güvencesi)
-Değerlendirme sonuçları (Proposal) sonrasında koda yapılan kapsamlı mimari geliştirmeler:
 
 * **Mimari Revizyon:** Proje analizleri sonucunda `main.rs`'teki devasa bloklar, yardımcı fonksiyon kollarına (handler) ayrılarak *Clean Code (Temiz Kod)* prensiplerine uygun hale getirildi. Fonksiyonların ortalama satır sayısı ciddi seviyede optimize edildi.
 * **Kalite ve Test (QA):** Eksikliği değerlendirmede belirtilen `#[tokio::test]` birim (unit) testleri modüllere dâhil edildi.
@@ -20,7 +19,6 @@ Değerlendirme sonuçları (Proposal) sonrasında koda yapılan kapsamlı mimari
 ---
 
 ### 🌱 Nisan 2026 - v1.0.0 (İlk Prototip & Çekirdek Inşası)
-Öğrenci *Deniz Pekova* tarafından ilk kod bloklarının devreye girdiği çıkış noktası:
 
 * **Çekirdek Sistem (Core):** Rust ile `cargo` ortamı kullanılarak proje başlatıldı. (`Initial commit` & `proje-file-created`)
 * **Alt Yardımcı Servisler (Helpers):** Zafiyet keşfi yapan çekirdek asenkron Rust modülleri kodlandı:
