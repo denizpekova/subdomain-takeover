@@ -8,85 +8,85 @@
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 </div>
 
-Bu proje, Rust tabanlı, yüksek performanslı ve asenkron (`Tokio` altyapısı) çalışan kapsamlı bir ofansif güvenlik (pentest) aracıdır. Zafiyet taraması, port açıklarının tespiti ve DNS/Subdomain bilgi toplamayı tek bir etkileşimli menü üzerinden saniyeler içinde yapmanızı sağlar.
+This project is a high-performance, asynchronous (`Tokio`-based), comprehensive offensive security (pentest) tool built with Rust. It allows you to perform vulnerability scanning, open port detection, and DNS/Subdomain enumeration through a single interactive menu — all within seconds.
 
 ---
 
-**Öğrenci:** Deniz Pekova  
-**Danışman Akademisyen:** Keyvan Arasteh
-**Kurum:** İstinye Üniversitesi, Bilişim Güvenliği Teknolojisi
+**Student:** Deniz Pekova  
+**Advisor:** Keyvan Arasteh  
+**Institution:** İstinye University, Information Security Technology
 
 ---
 
-## 📋 İçindekiler (Table of Contents)
-- [🌟 Ana Özellikler](#-ana-özellikler)
-- [🛠️ Teknolojiler Yığını (Tech Stack)](#️-teknolojiler-yığını-tech-stack)
-- [⚙️ Kurulum ve Kullanım](#️-kurulum-ve-kullanım)
-  - [Docker ile Kullanım](#docker-ile-kullanım)
-- [⚠️ Sorumluluk Reddi (Disclaimer)](#️-sorumluluk-reddi-disclaimer)
-- [📜 Lisans](#-lisans)
+## 📋 Table of Contents
+- [🌟 Key Features](#-key-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [⚙️ Installation & Usage](#️-installation--usage)
+  - [Usage with Docker](#usage-with-docker)
+- [⚠️ Disclaimer](#️-disclaimer)
+- [📜 License](#-license)
 
 ---
 
-## 🌟 Ana Özellikler
+## 🌟 Key Features
 
-### 1. 🚩 Subdomain Takeover Kontrolü
-* Hedef domain veya subdomain'e HTTP isteği atarak potansiyel zaafiyetleri inceler.
-* Arkasında sahipsiz bırakılmış **CNAME** kayıtlarını ve üçüncü taraf bulut servislerini popüler "NXDOMAIN" parmak izi okuması ile saptar (örn. *GitHub Pages, Amazon S3, Heroku*).
+### 1. 🚩 Subdomain Takeover Detection
+* Sends HTTP requests to target domains or subdomains to examine potential vulnerabilities.
+* Detects abandoned **CNAME** records and third-party cloud services using popular "NXDOMAIN" fingerprint matching (e.g. *GitHub Pages, Amazon S3, Heroku*).
 
-### 2. 🚀 Asenkron Port Tarayıcı
-* `1`'den `65535`'e kadar tüm TCP portlarını 500 paralel soketle (semaphore limitli) eşzamanlı tarar.
-* Servisleri test ederken düşük gecikme ayarlarına (timeout) sahiptir.
+### 2. 🚀 Async Port Scanner
+* Scans all TCP ports from `1` to `65535` concurrently using 500 parallel sockets (semaphore-limited).
+* Operates with low-latency timeout settings when probing services.
 
-### 3. 🔍 Subdomain Keşfi (Wordlist & Brute-Force)
-* İstek yollayarak wordlist tabanlı alt alan adı tespiti yapar.
-* **Akıllı İndirme:** Araca talimat verip saniyeler içinde **SecLists'in** 5000 kelimelik top listesini doğrudan çekip asenkron test edebilirsiniz.
+### 3. 🔍 Subdomain Discovery (Wordlist & Brute-Force)
+* Performs wordlist-based subdomain discovery by sending requests.
+* **Smart Download:** You can instruct the tool to pull **SecLists'** top 5000-word list directly and run async tests within seconds.
 
-### 4. 📡 DNS Kayıt Keşfi (Record Enumerator)
-* Modern `hickory-resolver` kullanılarak **A, AAAA, MX, NS, TXT** DNS kayıtları sorgulanır.
+### 4. 📡 DNS Record Enumeration (Record Enumerator)
+* Queries **A, AAAA, MX, NS, TXT** DNS records using the modern `hickory-resolver`.
 
-### 5. 🛡️ HTTP Güvenlik Başlıkları Kontrolü
-* Uygulamaların `Strict-Transport-Security`, `CSP` vb. politikalarını tarar.
-* Sızan `Server` başlıklarını uyarır.
-
----
-
-## 🛠️ Teknolojiler Yığını (Tech Stack)
-
-* **[Rust](https://www.rust-lang.org/):** Güvenli ve ışık hızında derlemeli dil.
-* **[Tokio](https://tokio.rs/):** Yüksek seviye IO ve asenkron işlemler.
-* **[Hickory DNS](https://hickory-dns.org/):** Modern asenkron DNS çözümleyici.
-* **[Reqwest](https://docs.rs/reqwest/latest/reqwest/):** Asenkron HTTP istemcisi.
-* **[Docker](https://www.docker.com/):** İzolasyon ve taşınabilir kurulum. (Opsiyonel)
+### 5. 🛡️ HTTP Security Header Checker
+* Scans applications for `Strict-Transport-Security`, `CSP`, and other security policies.
+* Warns about leaked `Server` headers.
 
 ---
 
-## ⚙️ Kurulum ve Kullanım
+## 🛠️ Tech Stack
 
-### Bağımlılıklar
-- [Cargo ve Rust Toolchain](https://rustup.rs/) (Manuel kurulum için)
+* **[Rust](https://www.rust-lang.org/):** A safe and blazing-fast compiled language.
+* **[Tokio](https://tokio.rs/):** High-level IO and asynchronous operations.
+* **[Hickory DNS](https://hickory-dns.org/):** Modern async DNS resolver.
+* **[Reqwest](https://docs.rs/reqwest/latest/reqwest/):** Async HTTP client.
+* **[Docker](https://www.docker.com/):** Isolation and portable deployment. (Optional)
 
-### Doğrudan Kurulum
+---
 
-1. Depoyu klonlayın:
+## ⚙️ Installation & Usage
+
+### Dependencies
+- [Cargo and Rust Toolchain](https://rustup.rs/) (for manual installation)
+
+### Direct Installation
+
+1. Clone the repository:
    ```bash
    git clone https://github.com/denizpekova/subdomain-takeover.git
    cd subdomain-takeover
    ```
 
-2. `.env` yapılandırmasını kopyalayın (isteğe bağlı):
+2. Copy the `.env` configuration (optional):
    ```bash
    cp .env.example .env
    ```
 
-3. Derleyip çalıştırın:
+3. Build and run:
    ```bash
    cargo run
    ```
 
-### Docker ile Kullanım
+### Usage with Docker
 
-Projeyi kendi ortamınızı kirletmeden container içinde derleyip çalıştırabilirsiniz:
+You can build and run the project inside a container without polluting your local environment:
 
 ```bash
 docker build -t subdomain-takeover .
@@ -95,17 +95,30 @@ docker run -it --rm subdomain-takeover
 
 ---
 
-## ⚠️ Sorumluluk Reddi (Disclaimer)
-Bu araç yalnızca **bilgi güvenliği çalışmaları** ve **siber güvenlik uzmanlarının araştırmaları** amacıyla tasarlanmıştır. Başka sistemlerin üzerine yazılı test izni almadan çalıştırılması yasa dışıdır.
+## ⚠️ Disclaimer
+This tool is designed solely for **information security research** and **cybersecurity professionals' investigations**. Running it against systems without explicit written permission is illegal.
 
-## 📜 Lisans
-Bu proje **MIT Lisansı** altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakınız.
+## 📜 License
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🖥️ Platform
+
+This tool runs on all major operating systems supported by the Rust toolchain:
+
+| Platform | Supported |
+|----------|-----------|
+| ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black) | ✅ |
+| ![macOS](https://img.shields.io/badge/macOS-000000?style=flat&logo=apple&logoColor=white) | ✅ |
+| ![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat&logo=windows&logoColor=white) | ✅ |
+
+> **Note:** Docker usage is recommended on Windows for the best experience.
 
 ---
 
 ## 🎬 Demo
 
-Projenin asenkron çalışma hızını ve özelliklerini gösteren terminal kayıtları aşağıdadır:
+Terminal recordings showcasing the tool's async speed and features are shown below:
 
 ![Terminal Demo](demo/project-demo.gif)
-
