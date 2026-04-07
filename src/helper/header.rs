@@ -1,5 +1,5 @@
-use reqwest::Client;
 use colored::*;
+use reqwest::Client;
 use std::time::Duration;
 
 /// Essential security headers to look for in the HTTP response.
@@ -17,9 +17,7 @@ const SECURITY_HEADERS: &[&str] = &[
 /// Useful for identifying potential clickjacking, XSS, or other misconfigurations.
 /// It automatically prefixes the target with HTTPS if no scheme is provided.
 pub async fn run(target: &str) -> anyhow::Result<()> {
-    let client = Client::builder()
-        .timeout(Duration::from_secs(5))
-        .build()?;
+    let client = Client::builder().timeout(Duration::from_secs(5)).build()?;
 
     let url = if target.starts_with("http://") || target.starts_with("https://") {
         target.to_string()
@@ -27,7 +25,10 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
         format!("https://{}", target) // Genellikle güvenlik özellikleri HTTPS üzerinden incelenir
     };
 
-    println!("\n🌐 {} için HTTP Güvenlik Başlıkları Kontrol Ediliyor...", url.bold().cyan());
+    println!(
+        "\n🌐 {} için HTTP Güvenlik Başlıkları Kontrol Ediliyor...",
+        url.bold().cyan()
+    );
 
     match client.get(&url).send().await {
         Ok(response) => {
@@ -37,28 +38,46 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
             println!("\n[{}] Bulunan Güvenlik Başlıkları:", "+".green());
             for &sec_h in SECURITY_HEADERS {
                 if let Some(val) = headers.get(sec_h) {
-                    println!("  [✓] {}: {}", sec_h.bright_green(), val.to_str().unwrap_or("okunamadı").yellow());
+                    println!(
+                        "  [✓] {}: {}",
+                        sec_h.bright_green(),
+                        val.to_str().unwrap_or("okunamadı").yellow()
+                    );
                 } else {
                     missing_headers.push(sec_h);
                 }
             }
 
             if !missing_headers.is_empty() {
-                println!("\n[{}] Eksik veya İhmal Edilmiş Güvenlik Başlıkları:", "-".red());
+                println!(
+                    "\n[{}] Eksik veya İhmal Edilmiş Güvenlik Başlıkları:",
+                    "-".red()
+                );
                 for h in missing_headers {
                     println!("  [!] {} bulunamadı!", h.red());
                 }
             } else {
-                 println!("\n[{}] Harika! Incelenen tüm standart güvenlik başlıkları mevcut.", "+".bright_green());
+                println!(
+                    "\n[{}] Harika! Incelenen tüm standart güvenlik başlıkları mevcut.",
+                    "+".bright_green()
+                );
             }
 
             // Server bilgisini de bilgi amaçlı basalım
             if let Some(server) = headers.get("server") {
-                println!("\n[{}] Sunucu (Server): {}", "i".cyan(), server.to_str().unwrap_or("Bilinmiyor").yellow());
+                println!(
+                    "\n[{}] Sunucu (Server): {}",
+                    "i".cyan(),
+                    server.to_str().unwrap_or("Bilinmiyor").yellow()
+                );
             }
         }
         Err(e) => {
-            println!("  [{}] Bağlantı sağlanamadı (Target Error): {}", "HATA".red(), e);
+            println!(
+                "  [{}] Bağlantı sağlanamadı (Target Error): {}",
+                "HATA".red(),
+                e
+            );
         }
     }
 

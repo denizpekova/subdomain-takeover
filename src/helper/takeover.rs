@@ -32,7 +32,7 @@ const FINGERPRINTS: &[Fingerprint] = &[
     },
 ];
 
-/// Checks the possibility of a Subdomain Takeover by comparing HTTP responses 
+/// Checks the possibility of a Subdomain Takeover by comparing HTTP responses
 /// with known cloud service provider error texts (fingerprints).
 /// Will also fallback to checking DNS resolution if HTTP fails.
 pub async fn check_takeover(domain: &str) {
@@ -49,7 +49,10 @@ pub async fn check_takeover(domain: &str) {
                 let mut vulnerable = false;
                 for fp in FINGERPRINTS {
                     if text.contains(fp.nxdomain_response) {
-                        println!("  [!!!] POTANSİYEL TAKEOVER BULUNDU! Servis: {}", fp.service);
+                        println!(
+                            "  [!!!] POTANSİYEL TAKEOVER BULUNDU! Servis: {}",
+                            fp.service
+                        );
                         vulnerable = true;
                     }
                 }
@@ -86,8 +89,7 @@ mod tests {
     #[tokio::test]
     async fn test_takeover_check() {
         // Try against a known invalid domain. It shouldn't panic.
+        // If it reaches here without panicking, the test passes.
         check_takeover("invalid-test-domain-123456.local").await;
-        // If it reaches here without panic, test passes
-        assert!(true);
     }
 }
