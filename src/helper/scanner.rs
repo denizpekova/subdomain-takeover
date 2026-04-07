@@ -8,11 +8,11 @@ use tokio::time::{timeout, Duration};
 /// Asynchronously scans all TCP ports (1 to 65535) for a given target.
 /// Utilizes a semaphore to limit concurrently open sockets (max 500) and timeouts for speed.
 pub async fn scan_ports(target: String) -> Result<()> {
-    // 0'dan değil, 1'den başlayarak 65535'e kadar (Tüm Network Portları)
+    // Starting from 1 instead of 0 up to 65535 (All Network Ports)
     let start: u16 = 1;
     let end: u16 = 65535;
 
-    // Taramayı inanılmaz hızlandırmak için aynı anda en fazla 500 soket bağlantısı yapmasına izin veriyoruz
+    // To significantly speed up scanning, we allow up to 500 concurrent socket connections
     let sem = Arc::new(Semaphore::new(500));
 
     let mut tasks = vec![];
@@ -26,12 +26,12 @@ pub async fn scan_ports(target: String) -> Result<()> {
             let _permit = permit;
             let addr = format!("{}:{}", target, port);
 
-            // Timeout süresini 800 yerine 600 ms'ye indirdik, böylece boştaki port geçişleri hızlandı
+            // Timeout reduced to 600ms instead of 800ms, faster switching of idle ports
             if timeout(Duration::from_millis(600), TcpStream::connect(&addr))
                 .await
                 .is_ok()
             {
-                println!("  [+] Port {} {}", port, "AÇIK".green());
+                println!("  [+] Port {} {}", port, "OPEN".green());
             }
         }));
     }
@@ -40,7 +40,7 @@ pub async fn scan_ports(target: String) -> Result<()> {
 
     println!(
         "{}",
-        "[✓] Tüm portların tarama işlemi tamamlandı.".magenta()
+        "[✓] Port scanning process completed.".magenta()
     );
     Ok(())
 }

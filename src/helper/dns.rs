@@ -7,11 +7,11 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
     let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
 
     println!(
-        "\n🌐 {} için DNS Kayıtları Sorgulanıyor...",
+        "\n🌐 Querying DNS Records for {}...",
         target.bold().cyan()
     );
 
-    // A kayıtları (IPv4)
+    // A records (IPv4)
     if let Ok(res) = resolver.ipv4_lookup(target).await {
         for ip in res.iter() {
             println!(
@@ -23,7 +23,7 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
         }
     }
 
-    // AAAA kayıtları (IPv6)
+    // AAAA records (IPv6)
     if let Ok(res) = resolver.ipv6_lookup(target).await {
         for ip in res.iter() {
             println!(
@@ -35,11 +35,11 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
         }
     }
 
-    // MX Kayıtları
+    // MX Records
     if let Ok(res) = resolver.mx_lookup(target).await {
         for mx in res.iter() {
             println!(
-                "  [{}] {} -> {} (Öncelik: {})",
+                "  [{}] {} -> {} (Priority: {})",
                 "MX".cyan(),
                 target.blue(),
                 mx.exchange().to_string().yellow(),
@@ -48,7 +48,7 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
         }
     }
 
-    // NS Kayıtları
+    // NS Records
     if let Ok(res) = resolver.ns_lookup(target).await {
         for ns in res.iter() {
             println!(
@@ -60,7 +60,7 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
         }
     }
 
-    // TXT Kayıtları
+    // TXT Records
     if let Ok(res) = resolver.txt_lookup(target).await {
         for txt in res.iter() {
             let texts: Vec<String> = txt
@@ -78,7 +78,7 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
         }
     }
 
-    println!("✅ DNS keşfi tamamlandı.\n");
+    println!("✅ DNS discovery completed.\n");
     Ok(())
 }
 

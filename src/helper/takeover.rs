@@ -39,7 +39,7 @@ pub async fn check_takeover(domain: &str) {
     let client = Client::builder()
         .timeout(Duration::from_secs(5))
         .build()
-        .expect("HTTP İstemcisi oluşturulamadı");
+        .expect("Failed to create HTTP Client");
 
     let url = format!("http://{}", domain);
 
@@ -50,7 +50,7 @@ pub async fn check_takeover(domain: &str) {
                 for fp in FINGERPRINTS {
                     if text.contains(fp.nxdomain_response) {
                         println!(
-                            "  [!!!] POTANSİYEL TAKEOVER BULUNDU! Servis: {}",
+                            "  [!!!] POTENTIAL TAKEOVER FOUND! Service: {}",
                             fp.service
                         );
                         vulnerable = true;
@@ -58,11 +58,11 @@ pub async fn check_takeover(domain: &str) {
                 }
                 if !vulnerable {
                     println!(
-                        "  [✓] Takeover zafiyeti tespit edilmedi (yanıt içeriği güvenli görünüyor)."
+                        "  [✓] No takeover vulnerability detected (response content looks safe)."
                     );
                 }
             } else {
-                println!("  [!] Sayfa okunamadı.");
+                println!("  [!] Page could not be read.");
             }
         }
         Err(e) => {
@@ -70,12 +70,12 @@ pub async fn check_takeover(domain: &str) {
             match resolver.ipv4_lookup(domain).await {
                 Ok(_) => {
                     println!(
-                        "  [!] DNS çözümlendi ancak HTTP isteği başarısız oldu.\nHata: {}",
+                        "  [!] DNS resolved but HTTP request failed.\nError: {}",
                         e
                     );
                 }
                 Err(_) => {
-                    println!("  [!] DNS çözümlenemedi (NXDOMAIN). Potansiyel CNAME takeover! Manuel kontrol ediniz.");
+                    println!("  [!] DNS could not be resolved (NXDOMAIN). Potential CNAME takeover! Please check manually.");
                 }
             }
         }

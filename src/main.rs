@@ -18,19 +18,19 @@ async fn get_input(prompt: &str, stdin: &mut io::BufReader<io::Stdin>) -> Result
 /// Helper function to handle subdomain takeover scanning from the main menu.
 async fn handle_takeover(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
     let target = get_input(
-        &format!("{} ", "Hedef Domain (örn: sub.example.com):".bold().green()),
+        &format!("{} ", "Target Domain (e.g. sub.example.com):".bold().green()),
         stdin,
     )
     .await?;
     if !target.is_empty() {
         println!(
-            "\n[{}] {} için Takeover Kontrolü Başlatılıyor...",
+            "\n[{}] Starting Takeover Check for {}...",
             "+".cyan(),
             target.white()
         );
         helper::takeover::check_takeover(&target).await;
     } else {
-        println!("{}", "HATA: Domain girmediniz!".red());
+        println!("{}", "ERROR: You didn't enter a domain!".red());
     }
     Ok(())
 }
@@ -38,20 +38,20 @@ async fn handle_takeover(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
 /// Helper function to handle async port scanning from the main menu.
 async fn handle_port_scan(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
     let target = get_input(
-        &format!("{} ", "Hedef Adres (örn: example.com):".bold().green()),
+        &format!("{} ", "Target Address (e.g. example.com):".bold().green()),
         stdin,
     )
     .await?;
     if target.is_empty() {
-        println!("{}", "HATA: Hedef girmediniz!".red());
+        println!("{}", "ERROR: You didn't enter a target!".red());
         return Ok(());
     }
     println!(
-        "\n[{}] Tüm portların (1..65535) taraması başlatılıyor. Bu işlem vakit alabilir...",
+        "\n[{}] Starting scan of all ports (1..65535). This may take a while...",
         "+".cyan()
     );
     if let Err(e) = helper::scanner::scan_ports(target).await {
-        println!("{} {}", "Tarama Hatası:".red(), e);
+        println!("{} {}", "Scan Error:".red(), e);
     }
     Ok(())
 }
@@ -59,46 +59,46 @@ async fn handle_port_scan(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
 /// Helper function to handle subdomain discovery using a wordlist.
 async fn handle_subdomain_discovery(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
     let target = get_input(
-        &format!("{} ", "Hedef Domain (örn: example.com):".bold().green()),
+        &format!("{} ", "Target Domain (e.g. example.com):".bold().green()),
         stdin,
     )
     .await?;
     if target.is_empty() {
-        println!("{}", "HATA: Hedef domain girmediniz!".red());
+        println!("{}", "ERROR: You didn't enter a target domain!".red());
         return Ok(());
     }
     println!(
-        "{} Wordlist'i internetten mi (SecLists 5000) çekelim, yoksa kendi dosyanızı mı kullanacaksınız?",
+        "{} Should we download the wordlist from the internet (SecLists 5000), or will you use your own file?",
         "[-]".cyan()
     );
-    println!("1 -> İnternetten doğrudan çek (Tavsiye edilen)");
-    println!("2 -> Kendi dosyamı gireceğim");
+    println!("1 -> Download directly from internet (Recommended)");
+    println!("2 -> I'll provide my own file");
 
-    let wl_choice = get_input(&format!("{} Seçiminiz: ", "=>".bold().yellow()), stdin).await?;
+    let wl_choice = get_input(&format!("{} Your Choice: ", "=>".bold().yellow()), stdin).await?;
     let wordlist_source = match wl_choice.as_str() {
         "1" => "default_url".to_string(),
         "2" => {
             let wordlist = get_input(
                 &format!(
                     "{} ",
-                    "Wordlist Dosya Yolu (örn: subdomains.txt):".bold().green()
+                    "Wordlist File Path (e.g. subdomains.txt):".bold().green()
                 ),
                 stdin,
             )
             .await?;
             if wordlist.is_empty() {
-                println!("{}", "HATA: Dosya yolu girmediniz!".red());
+                println!("{}", "ERROR: You didn't enter a file path!".red());
                 return Ok(());
             }
             wordlist
         }
         _ => {
-            println!("{}", "HATA: Geçersiz seçim!".red());
+            println!("{}", "ERROR: Invalid choice!".red());
             return Ok(());
         }
     };
     if let Err(e) = helper::subdomain::run(target, wordlist_source).await {
-        println!("{} {}", "Keşif Hatası:".red(), e);
+        println!("{} {}", "Discovery Error:".red(), e);
     }
     Ok(())
 }
@@ -106,16 +106,16 @@ async fn handle_subdomain_discovery(stdin: &mut io::BufReader<io::Stdin>) -> Res
 /// Helper function to handle DNS record lookup operations.
 async fn handle_dns_discovery(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
     let target = get_input(
-        &format!("{} ", "Hedef Domain (örn: example.com):".bold().green()),
+        &format!("{} ", "Target Domain (e.g. example.com):".bold().green()),
         stdin,
     )
     .await?;
     if target.is_empty() {
-        println!("{}", "HATA: Hedef domain girmediniz!".red());
+        println!("{}", "ERROR: You didn't enter a target domain!".red());
         return Ok(());
     }
     if let Err(e) = helper::dns::run(&target).await {
-        println!("{} {}", "DNS Keşif Hatası:".red(), e);
+        println!("{} {}", "DNS Discovery Error:".red(), e);
     }
     Ok(())
 }
@@ -123,16 +123,16 @@ async fn handle_dns_discovery(stdin: &mut io::BufReader<io::Stdin>) -> Result<()
 /// Helper function to deal with HTTP security headers checking.
 async fn handle_header_check(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
     let target = get_input(
-        &format!("{} ", "Hedef Domain (örn: example.com):".bold().green()),
+        &format!("{} ", "Target Domain (e.g. example.com):".bold().green()),
         stdin,
     )
     .await?;
     if target.is_empty() {
-        println!("{}", "HATA: Hedef domain girmediniz!".red());
+        println!("{}", "ERROR: You didn't enter a target domain!".red());
         return Ok(());
     }
     if let Err(e) = helper::header::run(&target).await {
-        println!("{} {}", "Başlık Kontrol Hatası:".red(), e);
+        println!("{} {}", "Header Check Error:".red(), e);
     }
     Ok(())
 }
@@ -143,15 +143,15 @@ async fn main() -> Result<()> {
     let mut stdin = io::BufReader::new(io::stdin());
 
     loop {
-        println!("\n{}", "=== ANA MENÜ ===".bold().blue());
-        println!("1 -> Subdomain Takeover Kontrolü");
-        println!("2 -> Port Tarayıcı (Tüm Portlar - 1..65535)");
-        println!("3 -> Subdomain Keşfi (Wordlist)");
-        println!("4 -> DNS Kayıt Keşfi (A, MX, NS, TXT vb.)");
-        println!("5 -> HTTP Güvenlik Başlıkları Kontrolü");
-        println!("6 -> Çıkış");
+        println!("\n{}", "=== MAIN MENU ===".bold().blue());
+        println!("1 -> Subdomain Takeover Check");
+        println!("2 -> Port Scanner (All Ports - 1..65535)");
+        println!("3 -> Subdomain Discovery (Wordlist)");
+        println!("4 -> DNS Record Discovery (A, MX, NS, TXT etc.)");
+        println!("5 -> HTTP Security Headers Check");
+        println!("6 -> Exit");
 
-        let choice = get_input(&format!("{} ", "Seçiminiz:".bold().yellow()), &mut stdin).await?;
+        let choice = get_input(&format!("{} ", "Your Choice:".bold().yellow()), &mut stdin).await?;
 
         match choice.as_str() {
             "1" => handle_takeover(&mut stdin).await?,
@@ -160,11 +160,11 @@ async fn main() -> Result<()> {
             "4" => handle_dns_discovery(&mut stdin).await?,
             "5" => handle_header_check(&mut stdin).await?,
             "6" | "q" | "quit" | "exit" => {
-                println!("{}", "Çıkış yapılıyor. İyi çalışmalar!".magenta());
+                println!("{}", "Exiting. Have a good day!".magenta());
                 break;
             }
             _ => {
-                println!("{}", "HATA: Geçersiz seçim, lütfen tekrar deneyin.".red());
+                println!("{}", "ERROR: Invalid choice, please try again.".red());
             }
         }
     }

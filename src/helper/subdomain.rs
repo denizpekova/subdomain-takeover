@@ -11,17 +11,17 @@ pub async fn run(target: String, source: String) -> anyhow::Result<()> {
         let url = "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt";
         let res = reqwest::get(url).await?.text().await?;
         println!(
-            "{} Varsayılan wordlist başarıyla indirildi (5000 satır).",
+            "{} Default wordlist downloaded successfully (5000 lines).",
             "[+]".green()
         );
         res
     } else {
         read_to_string(&source)
-            .map_err(|e| anyhow::anyhow!("Wordlist okuma hatası ({}): {}", source, e))?
+            .map_err(|e| anyhow::anyhow!("Wordlist read error ({}): {}", source, e))?
     };
 
     println!(
-        "\n🌐 {} için Subdomain keşfi başlıyor...",
+        "\n🌐 Starting Subdomain discovery for {}...",
         target.bold().cyan()
     );
     let mut tasks = vec![];
@@ -46,7 +46,7 @@ pub async fn run(target: String, source: String) -> anyhow::Result<()> {
 
     futures::future::join_all(tasks).await;
 
-    println!("✅ Subdomain keşfi tamamlandı.\n");
+    println!("✅ Subdomain discovery completed.\n");
     Ok(())
 }
 

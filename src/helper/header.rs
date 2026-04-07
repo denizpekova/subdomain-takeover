@@ -22,11 +22,11 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
     let url = if target.starts_with("http://") || target.starts_with("https://") {
         target.to_string()
     } else {
-        format!("https://{}", target) // Genellikle güvenlik özellikleri HTTPS üzerinden incelenir
+        format!("https://{}", target) // Security features are generally checked over HTTPS
     };
 
     println!(
-        "\n🌐 {} için HTTP Güvenlik Başlıkları Kontrol Ediliyor...",
+        "\n🌐 Checking HTTP Security Headers for {}...",
         url.bold().cyan()
     );
 
@@ -35,13 +35,13 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
             let headers = response.headers();
             let mut missing_headers = vec![];
 
-            println!("\n[{}] Bulunan Güvenlik Başlıkları:", "+".green());
+            println!("\n[{}] Found Security Headers:", "+".green());
             for &sec_h in SECURITY_HEADERS {
                 if let Some(val) = headers.get(sec_h) {
                     println!(
                         "  [✓] {}: {}",
                         sec_h.bright_green(),
-                        val.to_str().unwrap_or("okunamadı").yellow()
+                        val.to_str().unwrap_or("unreadable").yellow()
                     );
                 } else {
                     missing_headers.push(sec_h);
@@ -50,38 +50,38 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
 
             if !missing_headers.is_empty() {
                 println!(
-                    "\n[{}] Eksik veya İhmal Edilmiş Güvenlik Başlıkları:",
+                    "\n[{}] Missing or Neglected Security Headers:",
                     "-".red()
                 );
                 for h in missing_headers {
-                    println!("  [!] {} bulunamadı!", h.red());
+                    println!("  [!] {} not found!", h.red());
                 }
             } else {
                 println!(
-                    "\n[{}] Harika! Incelenen tüm standart güvenlik başlıkları mevcut.",
+                    "\n[{}] Great! All standard security headers checked are present.",
                     "+".bright_green()
                 );
             }
 
-            // Server bilgisini de bilgi amaçlı basalım
+            // Also print the server info for informational purposes
             if let Some(server) = headers.get("server") {
                 println!(
-                    "\n[{}] Sunucu (Server): {}",
+                    "\n[{}] Server: {}",
                     "i".cyan(),
-                    server.to_str().unwrap_or("Bilinmiyor").yellow()
+                    server.to_str().unwrap_or("Unknown").yellow()
                 );
             }
         }
         Err(e) => {
             println!(
-                "  [{}] Bağlantı sağlanamadı (Target Error): {}",
-                "HATA".red(),
+                "  [{}] Connection could not be established (Target Error): {}",
+                "ERROR".red(),
                 e
             );
         }
     }
 
-    println!("\n✅ Başlık analizi tamamlandı.\n");
+    println!("\n✅ Header analysis completed.\n");
     Ok(())
 }
 
