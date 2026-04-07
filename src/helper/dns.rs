@@ -6,10 +6,7 @@ use hickory_resolver::TokioAsyncResolver;
 pub async fn run(target: &str) -> anyhow::Result<()> {
     let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
 
-    println!(
-        "\n🌐 Querying DNS Records for {}...",
-        target.bold().cyan()
-    );
+    println!("\n🌐 Querying DNS Records for {}...", target.bold().cyan());
 
     // A records (IPv4)
     if let Ok(res) = resolver.ipv4_lookup(target).await {

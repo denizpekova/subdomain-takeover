@@ -18,7 +18,10 @@ async fn get_input(prompt: &str, stdin: &mut io::BufReader<io::Stdin>) -> Result
 /// Helper function to handle subdomain takeover scanning from the main menu.
 async fn handle_takeover(stdin: &mut io::BufReader<io::Stdin>) -> Result<()> {
     let target = get_input(
-        &format!("{} ", "Target Domain (e.g. sub.example.com):".bold().green()),
+        &format!(
+            "{} ",
+            "Target Domain (e.g. sub.example.com):".bold().green()
+        ),
         stdin,
     )
     .await?;

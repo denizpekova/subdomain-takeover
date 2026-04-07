@@ -38,10 +38,7 @@ pub async fn scan_ports(target: String) -> Result<()> {
 
     futures::future::join_all(tasks).await;
 
-    println!(
-        "{}",
-        "[✓] Port scanning process completed.".magenta()
-    );
+    println!("{}", "[✓] Port scanning process completed.".magenta());
     Ok(())
 }
 

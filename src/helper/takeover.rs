@@ -49,10 +49,7 @@ pub async fn check_takeover(domain: &str) {
                 let mut vulnerable = false;
                 for fp in FINGERPRINTS {
                     if text.contains(fp.nxdomain_response) {
-                        println!(
-                            "  [!!!] POTENTIAL TAKEOVER FOUND! Service: {}",
-                            fp.service
-                        );
+                        println!("  [!!!] POTENTIAL TAKEOVER FOUND! Service: {}", fp.service);
                         vulnerable = true;
                     }
                 }
@@ -69,10 +66,7 @@ pub async fn check_takeover(domain: &str) {
             let resolver = TokioAsyncResolver::tokio_from_system_conf().unwrap();
             match resolver.ipv4_lookup(domain).await {
                 Ok(_) => {
-                    println!(
-                        "  [!] DNS resolved but HTTP request failed.\nError: {}",
-                        e
-                    );
+                    println!("  [!] DNS resolved but HTTP request failed.\nError: {}", e);
                 }
                 Err(_) => {
                     println!("  [!] DNS could not be resolved (NXDOMAIN). Potential CNAME takeover! Please check manually.");

@@ -49,10 +49,7 @@ pub async fn run(target: &str) -> anyhow::Result<()> {
             }
 
             if !missing_headers.is_empty() {
-                println!(
-                    "\n[{}] Missing or Neglected Security Headers:",
-                    "-".red()
-                );
+                println!("\n[{}] Missing or Neglected Security Headers:", "-".red());
                 for h in missing_headers {
                     println!("  [!] {} not found!", h.red());
                 }
